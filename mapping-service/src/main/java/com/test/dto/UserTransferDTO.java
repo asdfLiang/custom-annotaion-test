@@ -1,79 +1,55 @@
 package com.test.dto;
 
 import com.alibaba.fastjson.JSONObject;
-import com.test.constant.StatusEnum;
 import com.mapping.util.AbsMapping;
+import com.test.constant.StatusEnum;
+import lombok.Data;
+import lombok.ToString;
 
 import java.util.Date;
 
+@Data
+@ToString
 public class UserTransferDTO extends AbsMapping<UserTransferDTO> {
 
     private Long id;
 
     private String name;
 
-    @CustomMapping
+    @CustomMapping(sourceClassName = "com.test.dto.UserDO", convertMethod = "long2Date")
+    @CustomMapping(sourceClassName = "com.test.dto.UserDTO")
     private Date birthday;
 
-    @CustomMapping(sourceField = "statusValue", convertMethod = "oldStatus2NewStatus")
+    @CustomMapping(sourceClassName = "com.test.dto.UserDO", sourceField = "statusCode", convertMethod = "oldStatus2NewStatus2")
+    @CustomMapping(sourceClassName = "com.test.dto.UserDTO", sourceField = "statusValue", convertMethod = "oldStatus2NewStatus")
     private String status;
 
     private JSONObject bizParams;
+
+    public UserTransferDTO() {
+    }
 
     // 状态转换方法
     public String oldStatus2NewStatus(StatusEnum statusValue) {
         return statusValue.name();
     }
 
-    public Long getId() {
-        return id;
+    // 状态转换方法
+    public String oldStatus2NewStatus2(Integer statusCode) {
+        switch (statusCode) {
+            case 0:
+                return "create";
+            case 1:
+                return "activate";
+            case 2:
+                return "abandon";
+            default:
+                throw new IllegalStateException("statusCode illegal");
+        }
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    // 日期格式转换
+    public Date long2Date(Long time) {
+        return new Date(time);
     }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Date getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public JSONObject getBizParams() {
-        return bizParams;
-    }
-
-    public void setBizParams(JSONObject bizParams) {
-        this.bizParams = bizParams;
-    }
-
-    @Override
-    public String toString() {
-        return "UserTransferDTO{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", birthday=" + birthday +
-                ", status='" + status + '\'' +
-                ", bizParams=" + bizParams +
-                '}';
-    }
-
 }

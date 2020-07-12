@@ -84,7 +84,8 @@ public class AbsMapping<R extends AbsMapping> {
         String targetFieldName = targetDescriptor.getDisplayName();
         Field targetField = targetClass.getDeclaredField(targetFieldName);
         // 根据注解判断是否要用自定义方法转换值
-        CustomMapping customMapping = targetField.getAnnotation(CustomMapping.class);
+        // 此处根据类名获取注解
+        CustomMapping customMapping = getCustomMappingByClassName(sourceObject.getClass().getName(), targetField);
         Object sourceValue;
         if (customMapping == null) {
             // 根据字段名称获取值
@@ -99,6 +100,35 @@ public class AbsMapping<R extends AbsMapping> {
         }
         // 写入值
         writeFieldValue(targetObject, targetDescriptor, sourceValue);
+    }
+
+    /**
+     * 根据类名获取字段
+     *
+     * @param className
+     * @param field
+     * @return
+     */
+    private CustomMapping getCustomMappingByClassName(String className, Field field) {
+        /* 获取当前字段上所有注解
+        只有一个注解直接获取该注解
+        有多个且有类名则根据名称返回匹配的CustomMapping注解 */
+        CustomMapping[] customMappings = field.getAnnotationsByType(CustomMapping.class);
+
+        if (customMappings == null || customMappings.length == 0) {
+            return null;
+        }
+
+        if (customMappings.length == 1) {
+            return customMappings[0];
+        } else {
+            for (CustomMapping customMapping : customMappings) {
+                if (className.equals(customMapping.sourceClassName())) {
+                    return customMapping;
+                }
+            }
+            throw new IllegalArgumentException("the 'className' is empty in the CustomMapping of " + field.getName());
+        }
     }
 
     /**
@@ -183,11 +213,34 @@ public class AbsMapping<R extends AbsMapping> {
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.RUNTIME)
     @Documented
+    @Repeatable(CustomMappings.class)
     protected @interface CustomMapping {
+        /**
+         * 源数据类名称
+         *
+         * @return
+         */
+        String sourceClassName() default "";
 
+        /**
+         * 源数据类中映射到当前字段的字段名称
+         *
+         * @return
+         */
         String sourceField() default "";
 
+        /**
+         * 转换方法名称，该方法实现写到目标类中
+         *
+         * @return
+         */
         String convertMethod() default "";
     }
 
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Documented
+    protected @interface CustomMappings {
+        CustomMapping[] value();
+    }
 }

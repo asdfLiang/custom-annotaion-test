@@ -1,6 +1,7 @@
 package com.test;
 
 import com.test.constant.StatusEnum;
+import com.test.dto.UserDO;
 import com.test.dto.UserDTO;
 import com.test.dto.UserTransferDTO;
 
@@ -11,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class DemoMain {
     public static void main(String[] args) {
-        // 测试数据
+        // mock数据
         List<UserDTO> userDTOList = new ArrayList<UserDTO>() {{
             add(new UserDTO(0L, "alice", new Date(), StatusEnum.activate));
             add(new UserDTO(1L, "bob", new Date(), StatusEnum.create));
@@ -22,6 +23,9 @@ public class DemoMain {
                 .map(new UserTransferDTO()::convertFrom).collect(Collectors.toList());
         // 输出
         userTransferDTOS.forEach(System.out::println);
+
+        UserTransferDTO david = new UserTransferDTO().convertFrom(new UserDO(3L, "david", new Date(), 1));
+        System.out.println(david);
     }
 
 
