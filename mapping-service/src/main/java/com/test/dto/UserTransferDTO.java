@@ -1,16 +1,20 @@
 package com.test.dto;
 
 import com.alibaba.fastjson.JSONObject;
-import com.mapping.util.AbsMapping;
+import com.mapping.util.AbsTransfer;
 import com.test.constant.StatusEnum;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.util.Date;
 
 @Data
 @ToString
-public class UserTransferDTO extends AbsMapping<UserTransferDTO> {
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserTransferDTO extends AbsTransfer<UserTransferDTO> {
 
     private Long id;
 
@@ -24,10 +28,9 @@ public class UserTransferDTO extends AbsMapping<UserTransferDTO> {
     @CustomMapping(sourceClassName = "com.test.dto.UserDTO", sourceField = "statusValue", convertMethod = "oldStatus2NewStatus")
     private String status;
 
-    private JSONObject bizParams;
+    private String text;
 
-    public UserTransferDTO() {
-    }
+    private JSONObject bizParams;
 
     // 状态转换方法
     public String oldStatus2NewStatus(StatusEnum statusValue) {

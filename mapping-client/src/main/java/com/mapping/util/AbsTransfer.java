@@ -10,9 +10,9 @@ import java.lang.reflect.Method;
  * @author liangzj
  * @date 2020/07/11 22:18
  */
-public class AbsMapping<R extends AbsMapping> {
+public class AbsTransfer<R extends AbsTransfer> {
     //
-    private Class<? extends AbsMapping> targetClass;
+    private Class<? extends AbsTransfer> targetClass;
     private BeanInfo targetBeanInfo;
     private PropertyDescriptor[] targetDescriptors;
     //
